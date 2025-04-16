@@ -646,21 +646,23 @@ func (p *IBMS3fsProvisioner) Provision(ctx context.Context, options controller.P
 		}
 
 		// if pvc.BucketVersioning != "" {
-		// 	enable := pvc.BucketVersioning == "true"
-		// 	if out, err := sess.SetBucketVersioning(pvc.Bucket, enable); err != nil {
+		// 	enable := strings.ToLower(strings.TrimSpace(pvc.BucketVersioning)) == "true"
+		// 	err := sess.SetBucketVersioning(pvc.Bucket, enable)
+		// 	if err != nil {
 		// 		if deleteBucket {
 		// 			err1 := sess.DeleteBucket(pvc.Bucket)
 		// 			if err1 != nil {
-		// 				return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+" : "+clusterID+" :cannot set bucket versioning %v and cannot delete bucket %s: %v", err, pvc.Bucket, err1)
+		// 				return nil, controller.ProvisioningFinished, fmt.Errorf("%s : %s : cannot set bucket versioning: %v and cannot delete bucket %s: %v", pvcName, clusterID, err, pvc.Bucket, err1)
 		// 			}
 		// 		}
-		// 		return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+":"+clusterID+" :failed to set versioning for bucket %s: %v", pvc.Bucket, err)
+		// 		return nil, controller.ProvisioningFinished, fmt.Errorf("%s:%s : failed to set versioning %t for bucket %s: %v", pvcName, clusterID, enable, pvc.Bucket, err)
 		// 	}
-		// 	contextLogger.Info(pvcName + ":" + clusterID + " : bucket versioning output '" + out + "' for bucket " + pvc.Bucket)
+		// 	contextLogger.Info(fmt.Sprintf("%s:%s : bucket versioning set to '%t' for bucket %s", pvcName, clusterID, enable, pvc.Bucket))
 		// }
-
 		if pvc.BucketVersioning != "" {
 			enable := strings.ToLower(strings.TrimSpace(pvc.BucketVersioning)) == "true"
+			contextLogger.Info(fmt.Sprintf("%s:%s : bucket versioning 'enable' evaluated to: %t", pvcName, clusterID, enable))
+
 			err := sess.SetBucketVersioning(pvc.Bucket, enable)
 			if err != nil {
 				if deleteBucket {

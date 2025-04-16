@@ -239,6 +239,11 @@ func (s *COSSession) SetBucketVersioning(bucket string, enabled bool) error {
 		},
 	})
 
+	// Log the output for debugging or confirmation
+	if out != nil {
+		s.logger.Info("Bucket versioning response", zap.String("bucket", bucket), zap.String("status", status), zap.Any("response", out))
+	}
+
 	// Check for errors from the AWS SDK call
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
@@ -251,10 +256,12 @@ func (s *COSSession) SetBucketVersioning(bucket string, enabled bool) error {
 	}
 
 	// Log the output for debugging or confirmation
-	s.logger.Info("Bucket versioning response",
-		zap.String("bucket", bucket),
-		zap.String("versioningStatus", status),
-		zap.Any("response", out))
+	if out != nil {
+		s.logger.Info("Bucket versioning response",
+			zap.String("bucket", bucket),
+			zap.String("versioningStatus", status),
+			zap.Any("response", out))
+	}
 
 	return nil
 }
